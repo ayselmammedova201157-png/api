@@ -1,0 +1,165 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+# --------------------
+# Task 1 — Kalkulyator API
+# --------------------
+
+@app.get("/topla/{a}/{b}")
+def topla(a: int, b: int):
+    return {"result": a + b}
+
+@app.get("/cix/{a}/{b}")
+def cix(a: int, b: int):
+    return {"result": a - b}
+
+@app.get("/vur/{a}/{b}")
+def vur(a: int, b: int):
+    return {"result": a * b}
+
+@app.get("/bol/{a}/{b}")
+def bol(a: int, b: int):
+    return {"result": a / b}
+
+
+# --------------------
+# Task 2 — User API
+# --------------------
+
+users = []
+
+class User(BaseModel):
+    name: str
+    age: int
+
+@app.post("/newUser")
+def new_user(user: User):
+    users.append(user.name)
+    return {"result": f"User '{user.name}' siyahiya elave olundu!"}
+
+@app.get("/userList")
+def user_list():
+    return {"result": users}
+
+
+# --------------------
+# Sual 3 — Kitab idaretmesi
+# --------------------
+
+books = []
+
+class Book(BaseModel):
+    id: int
+    title: str
+    author: str
+    page_count: int
+
+@app.post("/newBook")
+def new_book(book: Book):
+    books.append(book)
+    return {"result": "Book elave olundu"}
+
+@app.get("/bookList")
+def book_list():
+    return {"books": books}
+
+@app.patch("/updateBook")
+def update_book(id: int, newTitle: str):
+    for book in books:
+        if book.id == id:
+            book.title = newTitle
+            return {"result": "Book yenilendi"}
+    return {"result": "Book tapilmadi"}
+
+@app.delete("/deleteBook")
+def delete_book(id: int):
+    for book in books:
+        if book.id == id:
+            books.remove(book)
+            return {"result": "Book silindi"}
+    return {"result": "Book tapilmadi"}
+
+
+# --------------------
+# Sual 4 — Tapsiriq siyahisi
+# --------------------
+
+tasks = []
+
+class Homework(BaseModel):
+    id: int
+    title: str
+    is_done: bool = False
+
+@app.post("/newTask")
+def new_task(task: Homework):
+    tasks.append(task)
+    return {"result": "Task elave olundu"}
+
+@app.get("/taskList")
+def task_list():
+    return {"tasks": tasks}
+
+@app.patch("/checkTask")
+def check_task(id: int):
+    for task in tasks:
+        if task.id == id:
+            task.is_done = True
+            return {"result": "Task tamamlandi"}
+    return {"result": "Task tapilmadi"}
+
+@app.delete("/deleteTask")
+def delete_task(id: int):
+    for task in tasks:
+        if task.id == id:
+            tasks.remove(task)
+            return {"result": "Task silindi"}
+    return {"result": "Task tapilmadi"}
+
+
+# --------------------
+# Sual 5 — Mehsul katalogu
+# --------------------
+
+products = []
+
+class Product(BaseModel):
+    id: int
+    name: str
+    price: float
+    stock: int
+
+@app.post("/newProduct")
+def new_product(product: Product):
+    products.append(product)
+    return {"result": "Product elave olundu"}
+
+@app.get("/productList")
+def product_list():
+    return {"products": products}
+
+@app.patch("/addStock")
+def add_stock(id: int, amount: int):
+    for product in products:
+        if product.id == id:
+            product.stock += amount
+            return {"result": "Stock artirildi"}
+    return {"result": "Product tapilmadi"}
+
+@app.patch("/removeStock")
+def remove_stock(id: int, amount: int):
+    for product in products:
+        if product.id == id:
+            product.stock -= amount
+            return {"result": "Stock azaldildi"}
+    return {"result": "Product tapilmadi"}
+
+@app.delete("/deleteProduct")
+def delete_product(id: int):
+    for product in products:
+        if product.id == id:
+            products.remove(product)
+            return {"result": "Product silindi"}
+    return {"result": "Product tapilmadi"}
